@@ -1,0 +1,25 @@
+
+<div class="widget">
+<ol class="widget-list" id="history">
+   <div class="selectwrapper">
+   <select name="currentsensor" id="currentsensorhistory" onchange="fetchBox().then(insertOldEntries).then(checkForNewMeasurements)"></select>
+   </div>
+   <div id="history-entries"></div>
+</ol>
+<ol class="widget-list" id="graph">
+  <div class="selectwrapper">
+<select name="currentsensorgraph" id="currentsensorgraph" onchange="fetchBox().then(drawGraph)"></select>
+ </div>
+ <div id="graph-target"></div>
+</ol>
+<ol class="widget-list" id="sensors"></ol>
+<ul class="widget-tabs">
+  <li class="widget-tab">
+    <a href="#history" class="widget-tab-link"  onclick="initHistoryArea()">History</a>
+    <!-- Omitting the end tag is valid HTML and removes the space in-between inline blocks. -->
+  <li class="widget-tab">
+    <a href="#graph" class="widget-tab-link" onclick="initGraphArea()">Graph</a>
+  <li class="widget-tab">
+    <a href="#sensors" class="widget-tab-link">Sensors</a>
+</ul>
+</div>
