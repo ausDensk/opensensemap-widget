@@ -30,7 +30,6 @@ body {
 .widget {
   position: relative;
   margin: 20px auto 10px;
-  width: 320px;
   background: white;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -202,7 +201,23 @@ li:last-child > .widget-list-link {
   padding-left: 2px;
 }
 
+.widget-header {
+  position: relative;
+  display: flex;
+}
 
+.widget-header img {
+  height: 80%;
+  padding: 2px 2px 2px 2px;
+}
+
+.widget-wrapper {
+  position: relative;
+  margin: auto;
+  display: flex;
+  width: 100%;
+  height: 100%
+}
 
 
     /*
