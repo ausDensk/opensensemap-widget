@@ -4,7 +4,7 @@ var sensebox = widget.getAttribute("data-sensebox-id");
 getWidgetHTML()
 .then(content => {
     widget.innerHTML = content;
-    insertWidgetStyle("style.css");
+    insertStyleWithLoadListener("style.css");
     console.log(sensebox);
     initSensorArea()
 })
@@ -24,6 +24,7 @@ function insertWidgetStyle(url) {
         link.rel = "stylesheet";
         link.type = "text/css";
         link.href = url;
+        link.onload = adjustHeight();
         document.querySelector("head").appendChild(link)
 }
 
@@ -57,7 +58,7 @@ function createSensorDivs(sensors) {
 }
 
 function fillDiv(element, data) {
-    element.innerHTML = "<h3>" + data.title + ": </h3><p>" + formatDates(new Date(data.lastMeasurement.createdAt)) + ": " + data.lastMeasurement.value + " " + data.unit;
+    element.innerHTML = "<h3>" + data.title + ": </h3><p><i>" + formatDates(new Date(data.lastMeasurement.createdAt)) + "</i>: " + data.lastMeasurement.value + " " + data.unit + "</p>";
 }
 
 function updateCurrentSensorValues() {
@@ -132,7 +133,7 @@ function searchSensorinArray (id, arr) {
 function addEntry(date, value, unit) {
     var newDiv = document.createElement('div');
     newDiv.className = "innerDiv-history";
-    newDiv.innerHTML = "<p><i>" + date + "</i>: " + value + unit + "</p>";
+    newDiv.innerHTML = "<p><i>" + date + "</i>: <b>" + value + unit + "</b></p>";
     var historyEntries = document.getElementById("history-entries");
     historyEntries.insertBefore(newDiv, historyEntries.firstChild);
 }
@@ -217,4 +218,30 @@ function drawGraph(sensorObject) {
             }
         });
     })
+}
+
+function adjustHeight () {
+    var widgetHeight = document.querySelector(".widget").getBoundingClientRect().height;
+    console.log(widgetHeight);
+    var widgetLists = document.querySelectorAll(".widget-list");
+    console.log(widgetLists);
+    widgetLists.forEach(element => {
+        console.log(element);
+        element.style.marginTop = 0.1 * widgetHeight + "px";
+    })
+}
+
+function insertStyleWithLoadListener(url) {
+    var style = document.createElement('style');
+    style.textContent = '@import "' + url + '"';
+    
+    var fi = setInterval(function() {
+      try {
+        style.sheet.cssRules;
+        adjustHeight();
+        clearInterval(fi);
+      } catch (e){}
+    }, 10);  
+    
+    document.head.appendChild(style);
 }

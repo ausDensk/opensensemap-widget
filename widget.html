@@ -6,8 +6,10 @@
 <div class="widget">
 <ol class="widget-list" id="history">
    <div class="selectwrapper">
+     <label class="custom-select">
    <select name="currentsensor" id="currentsensorhistory" onchange="fetchBox().then(insertOldEntries).then(checkForNewMeasurements)"></select>
-   </div>
+     </label>
+  </div>
    <div id="history-entries"></div>
 </ol>
 <ol class="widget-list" id="graph">
@@ -19,7 +21,9 @@
 <ol class="widget-list" id="sensors"></ol>
 <ul class="widget-tabs">
   <li class="widget-tab">
+    <div style="display: flex; width: 100%; height: 100%">
     <a href="#history" class="widget-tab-link"  onclick="initHistoryArea()">History</a>
+    </div>
     <!-- Omitting the end tag is valid HTML and removes the space in-between inline blocks. -->
   <li class="widget-tab">
     <a href="#graph" class="widget-tab-link" onclick="initGraphArea()">Graph</a>

@@ -1,3 +1,7 @@
+:root {
+  --sensebox-color: #4EAF47;
+}
+
 .widget {
   position: relative;
   padding-top: 0px;
@@ -26,7 +30,6 @@
   display: inline-block;
   vertical-align: top;
   margin-top: 3px;
-  line-height: 36px;
   font-weight: normal;
   color: #999;
   background: #fcfcfc;
@@ -42,12 +45,16 @@
 .widget-list:target:first-of-type ~ .widget-tabs > .widget-tab:first-child ~ .widget-tab > .widget-tab-link,
 .widget-list:target:nth-of-type(2) ~ .widget-tabs > .widget-tab:nth-child(2) ~ .widget-tab > .widget-tab-link,
 .widget-list:target:last-of-type ~ .widget-tabs > .widget-tab:last-child ~ .widget-tab > .widget-tab-link {
-  margin: 0;
+  margin: auto;
   border-top: 0;
 }
 
 .widget-tab + .widget-tab {
   margin-right: -1px;
+}
+
+.widget-tab {
+  display: flex;
 }
 
 .widget-tab:last-child,
@@ -65,7 +72,7 @@
 }
 
 .widget-tab-link {
-  display: block;
+  position: absolute;
   min-width: 60px;
   padding: 0 15px;
   color: inherit;
@@ -75,21 +82,12 @@
 }
 
 .widget-list {
-  /*display: none;
-  padding-top: 10%;
-  overflow-y: scroll;
+  display: none;
+  overflow-y: auto;
   padding-bottom: 0px;
-  margin-top: 0px;
-  height: 80%*/
-display: none;
-padding-top: 3%;
-overflow-y: auto;
-padding-bottom: 0px;
-margin-top: 10%;
-height: 90%;
-margin-bottom: 0;
-position: absolute;
-width: 100%;
+  height: 90%;
+  position: absolute;
+  width: 100%;
 }
 
 .widget-list > li + li {
@@ -140,9 +138,9 @@ li:last-child > .widget-list-link {
 }
 
 #graph-target {
-  width: 90%;
-  height: 100%;
-  padding-left: 10%;
+  width: 100%;
+  height: 90%;
+  padding-left: 0%;
 }
 
 #graph {
@@ -164,16 +162,33 @@ li:last-child > .widget-list-link {
   width: 90%;
 }
 
+.innerDiv h3 {
+  color: var(--sensebox-color);
+}
+
+.innerDiv p {
+  color: grey;
+}
+
 .innerDiv-history {
   width: 80%;
   height: 20%;
   border: 1px solid lightgrey;
-  margin: auto;
+  margin: 10px auto;
   border-radius: 5px;
 }
 
 .innerDiv-history p {
   padding-left: 2px;
+  color: grey;
+}
+
+.innerDiv-history b {
+  color: var(--sensebox-color);
+}
+
+.innerDiv-history i {
+  color: grey;
 }
 
 .widget-header {
@@ -206,6 +221,90 @@ li:last-child > .widget-list-link {
   color: #4EAF47;
 }
 
+#graph-target svg {
+  height: 87.5%;
+  width: 100%;
+  position: absolute;
+}
+
+#graph-target {
+  font-color: grey;
+}
+
+.mg-chart-title {
+  color: grey;
+}
+
+.custom-select {
+  display: inline-block;
+  position: relative;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  /* Styling the select background */
+  background-color: white;
+}
+.custom-select select {
+  width: auto;
+  margin: 0;
+  padding: .75em 1.5em;
+  outline: none;
+  cursor: pointer;
+  border: none;
+  border-radius: 0;
+  background-color: white;
+  /* removes the fucking native down arrow */
+  -webkit-appearance: none;
+  -moz-appearance: window;
+  color: var(--sensebox-color);
+}
+.custom-select:after {
+  position: absolute;
+  top: 1.25em;
+  right: 1em;
+  /* Styling the down arrow */
+  width: 0;
+  height: 0;
+  padding: 0;
+  content: '';
+  border-left: .25em solid transparent;
+  border-right: .25em solid transparent;
+  border-top: .375em solid var(--sensebox-color);
+  pointer-events: none;
+}
+
+#currentsensorgraph {
+  background-color: white;
+  color: green;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  border: 1px solid lightgrey;
+  border-radius: 3px;
+  text-align: center;
+  padding: 2px;
+}
+
+#currentsensorgraph:after {
+  position: absolute;
+  top: 1.25em;
+  right: 1em;
+  /* Styling the down arrow */
+  width: 0;
+  height: 0;
+  padding: 0;
+  content: '';
+  border-left: .25em solid transparent;
+  border-right: .25em solid transparent;
+  border-top: .375em solid var(--sensebox-color);
+  pointer-events: none;
+}
+
+#currentsensorgraph option {
+  border: none;
+  outline: none;
+}
 
     /*
  * Copyright (c) 2013 Thibaut Courouble
