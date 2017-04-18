@@ -37,6 +37,9 @@ function initSensorArea() {
         createSensorDivs(sensors);
         setInterval(updateCurrentSensorValues, 1000)
     })
+    .catch(err => {
+        document.querySelector("#sensors").innerHTML = "Ein Fehler ist aufgetreten: " + err;
+    })
 }
 
 function appendTitle(title) {
@@ -69,7 +72,11 @@ function createSensorDivs(sensors) {
 }
 
 function fillDiv(element, data) {
-    element.innerHTML = "<h3>" + data.title + ": </h3><p><i>" + formatDates(new Date(data.lastMeasurement.createdAt)) + "</i>: " + data.lastMeasurement.value + " " + data.unit + "</p>";
+    if (data.lastMeasurement) {
+        element.innerHTML = "<h3>" + data.title + ": </h3><p><i>" + formatDates(new Date(data.lastMeasurement.createdAt)) + "</i>: " + data.lastMeasurement.value + " " + data.unit + "</p>";
+    } else {
+        element.innerHTML = "<h3>" + data.title + ": </h3><p>Keine Daten verfügbar...</p>";
+    }
 }
 
 function updateCurrentSensorValues() {
@@ -99,6 +106,9 @@ function initHistoryArea() {
                 setInterval(checkForNewMeasurements, 3000);
             }
         })
+        .catch(err => {
+            document.getElementById("history-entries").innerHTML = "Es ist ein Fehler aufgetreten: " + err;
+        })
 }
 
 function createAndInsertOptions(optionArray, select) {
@@ -119,9 +129,18 @@ function insertOldEntries(sensorObject) {
     console.log("sensorID: " + sensorID);
     return fetchJSON("https://api.opensensemap.org/boxes/" + sensebox + "/data/" + sensorID)
     .then(measurements => {
-        for (var i = 4; i >= 0; i--) { //Weil neuester Eintrag bei 0
-            addEntry(formatDates(new Date(measurements[i].createdAt)), measurements[i].value, currentSensor.unit)
-        };
+        console.log(measurements);
+        if (measurements.length !== 0) {
+            console.log("NICHT LEER!")
+            var i = 4;
+            while (i >= 0 && measurements[i]) {
+                addEntry(formatDates(new Date(measurements[i].createdAt)), measurements[i].value, currentSensor.unit);
+                i--;
+            };
+        } else {
+            console.log("LEER!")
+            document.getElementById("history-entries").innerHTML = "Leider gibt es hierfür noch keine Messwerte."
+        }
     })
 }
 
@@ -169,13 +188,15 @@ function fillWithZero(number) {
 
 function checkForNewMeasurements() {
     fetchBox()
-        .then(sensorData => {
-            var sensorID = getSelectedValue("currentsensorhistory");
-            console.log(sensorData)
-            var currentSensor = searchSensorinArray(sensorID, sensorData.sensors);
+    .then(sensorData => {
+        var sensorID = getSelectedValue("currentsensorhistory");
+        console.log(sensorData)
+        var currentSensor = searchSensorinArray(sensorID, sensorData.sensors);
+        if (currentSensor.lastMeasurement) {
             var parsedDate = formatDates(new Date(currentSensor.lastMeasurement.createdAt));
             if (!document.getElementById("history-entries").firstChild.innerHTML.startsWith("<p><i>" + parsedDate)) addEntry(parsedDate, currentSensor.lastMeasurement.value, currentSensor.unit)
-        })
+        }
+    })
 }
 
 //Diese Funktionen werden aufgerufen, wenn der Graphen-Tab angeklickt wird.
@@ -192,6 +213,9 @@ function initGraphArea() {
                 drawGraph(sensorData);
             }
         })
+        .catch(err => {
+            document.querySelector("#graph-target").innerHTML = "Ein Fehler ist aufgetreten: " + err;
+        })
 }
 
 function drawGraph(sensorObject) {
@@ -206,28 +230,32 @@ function drawGraph(sensorObject) {
     var url = "https://api.opensensemap.org/boxes/" + sensebox + "/data/" + sensorID;
     d3.json(url, function(data) {
         console.log(data);
-        data = MG.convert.date(data, 'createdAt', d3.utcParse("%Y-%m-%dT%H:%M:%S.%LZ"));
-        MG.data_graphic({
-            data: data,
-            full_width: true,
-            full_height: true,
-            right: 40,
-            target: graphArea,
-            area: false,
-            backgroundColor: '#8C001A',
-            title: currentSensor.title + " in " + currentSensor.unit,
-            xax_count: 3,
-            color: '#8C001A',
-            x_accessor: 'createdAt',
-            y_accessor: 'value',
-            inflator: 5,
-            mouseover: function(d, i) {
-                var formattedDate = formatDates(new Date(d.createdAt));
-                var measurement = formattedDate + " -> " + d.value + " " + currentSensor.unit;
-                d3.select('#graph-target svg .mg-active-datapoint')
-                .text(measurement);
-            }
-        });
+        if (data.length !== 0) {
+            data = MG.convert.date(data, 'createdAt', d3.utcParse("%Y-%m-%dT%H:%M:%S.%LZ"));
+            MG.data_graphic({
+                data: data,
+                full_width: true,
+                full_height: true,
+                right: 40,
+                target: graphArea,
+                area: false,
+                backgroundColor: '#8C001A',
+                title: currentSensor.title + " in " + currentSensor.unit,
+                xax_count: 3,
+                color: '#8C001A',
+                x_accessor: 'createdAt',
+                y_accessor: 'value',
+                inflator: 5,
+                mouseover: function(d, i) {
+                    var formattedDate = formatDates(new Date(d.createdAt));
+                    var measurement = formattedDate + " -> " + d.value + " " + currentSensor.unit;
+                    d3.select('#graph-target svg .mg-active-datapoint')
+                    .text(measurement);
+                }
+            });
+        } else {
+            graphArea.innerHTML = "Leider gibt es hierfür noch keine Messwerte."
+        }
     })
 }
 
