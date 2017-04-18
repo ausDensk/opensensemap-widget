@@ -19,15 +19,14 @@
   border-radius: 3px 3px 0 0;
   display: flex;
   margin-top: 0px;
-  height: 7%;
+  height: 9%;
 }
 
 .widget-tab,
-.widget-list:target:first-of-type ~ .widget-tabs > .widget-tab:first-child ~ .widget-tab,
-.widget-list:target:nth-of-type(2) ~ .widget-tabs > .widget-tab:nth-child(2) ~ .widget-tab,
-.widget-list:target:last-of-type ~ .widget-tabs > .widget-tab:last-child ~ .widget-tab {
+.widget-list:target:first-of-type ~ .widget-tabs > .widget-tab:first-child,
+.widget-list:target:nth-of-type(2) ~ .widget-tabs > .widget-tab:first-child {
   position: relative;
-  display: inline-block;
+  display: flex;
   vertical-align: top;
   margin-top: 3px;
   font-weight: normal;
@@ -41,10 +40,10 @@
   width: 33%;
 }
 
-.widget-tab > .widget-tab-link,
-.widget-list:target:first-of-type ~ .widget-tabs > .widget-tab:first-child ~ .widget-tab > .widget-tab-link,
+.widget-tab > .widget-tab-link
+/*.widget-list:target:first-of-type ~ .widget-tabs > .widget-tab:first-child ~ .widget-tab > .widget-tab-link,
 .widget-list:target:nth-of-type(2) ~ .widget-tabs > .widget-tab:nth-child(2) ~ .widget-tab > .widget-tab-link,
-.widget-list:target:last-of-type ~ .widget-tabs > .widget-tab:last-child ~ .widget-tab > .widget-tab-link {
+.widget-list:target:last-of-type ~ .widget-tabs > .widget-tab:last-child ~ .widget-tab > .widget-tab-link*/ {
   margin: auto;
   border-top: 0;
 }
@@ -53,18 +52,14 @@
   margin-right: -1px;
 }
 
-.widget-tab {
-  display: flex;
-}
-
-.widget-tab:last-child,
-.widget-list:target:first-of-type ~ .widget-tabs > .widget-tab:first-child,
-.widget-list:target:nth-of-type(2) ~ .widget-tabs > .widget-tab:nth-child(2),
-.widget-list:target:last-of-type ~ .widget-tabs > .widget-tab:last-child {
+/* Das Ding hier hebt einen Tab hervor*/
+.widget-tab:first-child,
+.widget-list:target:first-of-type ~ .widget-tabs > .widget-tab:nth-child(2),
+.widget-list:target:nth-of-type(2) ~ .widget-tabs > .widget-tab:last-child,
+.widget-list:target:last-of-type ~ .widget-tabs > .widget-tab:first-child {
   bottom: -1px;
   margin-top: 0;
   padding-bottom: 2px;
-  line-height: 34px;
   font-weight: bold;
   color: #555;
   background: white;
@@ -72,9 +67,9 @@
 }
 
 .widget-tab-link {
-  position: absolute;
+  position: relative;
   min-width: 60px;
-  padding: 0 15px;
+  /*padding: 0 15px*/;
   color: inherit;
   text-align: center;
   text-decoration: none;
@@ -99,7 +94,8 @@
 }
 
 .widget-list:target {
-  display: block;
+  display: flex;
+  flex-direction: column;
 }
 
 .widget-list:target ~ .widget-list {
@@ -148,10 +144,10 @@ li:last-child > .widget-list-link {
 }
 
 .selectwrapper {
-  margin: 0 auto;
-  text-align: center;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  display: inline-block;
+  margin: 10px auto;
+  border: 1px solid lightgray;
+  border-radius: 3px;
 }
 
 #history {
@@ -172,10 +168,11 @@ li:last-child > .widget-list-link {
 
 .innerDiv-history {
   width: 80%;
-  height: 20%;
+  height: 50px;
   border: 1px solid lightgrey;
   margin: 10px auto;
   border-radius: 5px;
+  padding: 5px;
 }
 
 .innerDiv-history p {
@@ -194,7 +191,7 @@ li:last-child > .widget-list-link {
 .widget-header {
   position: relative;
   display: flex;
-  height: 20%;
+  height: 15%;
 }
 
 .widget-header img {
@@ -214,11 +211,7 @@ li:last-child > .widget-list-link {
   flex-direction: column;
   width: 100%;
   height: 100%;
-}
-
-.widget-header h1 {
-  margin: auto;
-  color: #4EAF47;
+  box-sizing: border-box;
 }
 
 #graph-target svg {
@@ -235,62 +228,21 @@ li:last-child > .widget-list-link {
   color: grey;
 }
 
-.custom-select {
-  display: inline-block;
-  position: relative;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  transform: translateY(-50%);
-  /* Styling the select background */
-  background-color: white;
-}
-.custom-select select {
-  width: auto;
-  margin: 0;
-  padding: .75em 1.5em;
-  outline: none;
-  cursor: pointer;
-  border: none;
-  border-radius: 0;
-  background-color: white;
-  /* removes the fucking native down arrow */
-  -webkit-appearance: none;
-  -moz-appearance: window;
-  color: var(--sensebox-color);
-}
-.custom-select:after {
-  position: absolute;
-  top: 1.25em;
-  right: 1em;
-  /* Styling the down arrow */
-  width: 0;
-  height: 0;
-  padding: 0;
-  content: '';
-  border-left: .25em solid transparent;
-  border-right: .25em solid transparent;
-  border-top: .375em solid var(--sensebox-color);
-  pointer-events: none;
-}
-
-#currentsensorgraph {
+.widgetselect {
   background-color: white;
   color: green;
   -moz-appearance: none;
   -webkit-appearance: none;
   outline: none;
-  border: 1px solid lightgrey;
+  border: none;
   border-radius: 3px;
   text-align: center;
   padding: 2px;
 }
 
-#currentsensorgraph:after {
+.selectlabel::after {
   position: absolute;
   top: 1.25em;
-  right: 1em;
-  /* Styling the down arrow */
   width: 0;
   height: 0;
   padding: 0;
@@ -298,7 +250,6 @@ li:last-child > .widget-list-link {
   border-left: .25em solid transparent;
   border-right: .25em solid transparent;
   border-top: .375em solid var(--sensebox-color);
-  pointer-events: none;
 }
 
 #currentsensorgraph option {
@@ -306,11 +257,38 @@ li:last-child > .widget-list-link {
   outline: none;
 }
 
-    /*
- * Copyright (c) 2013 Thibaut Courouble
- * http://www.cssflow.com
- * Licensed under the MIT License
- *
- * Sass/SCSS source: http://goo.gl/1r6UDT
- * PSD by Aaron Sananes: http://goo.gl/AlBLzO
- */
+#graph:target {
+  display: flex;
+  flex-direction: column;
+}
+
+#history:target {
+  display: flex;
+  flex-direction: column;
+}
+
+#history:target {
+  display: flex;
+  flex-direction: column;
+}
+
+.arrowwrapper {
+  display: inline-flex;
+  width: 1em;
+  height: 100%;
+  vertical-align: middle;
+}
+
+.arrow {
+  width: 20%;
+  margin: auto;
+  border-left: .25em solid transparent;
+  border-right: .25em solid transparent;
+  border-top: .375em solid var(--sensebox-color);
+  pointer-events: none;
+}
+
+#titlearea {
+  margin: auto;
+  color: #4EAF47;
+}

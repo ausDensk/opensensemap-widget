@@ -31,11 +31,22 @@ function insertWidgetStyle(url) {
 function initSensorArea() {
     return fetchBox()
     .then(sensorData => {
+        appendTitle(sensorData.name);
         console.log(sensorData.name)
         var sensors = sensorData.sensors;
         createSensorDivs(sensors);
         setInterval(updateCurrentSensorValues, 1000)
     })
+}
+
+function appendTitle(title) {
+    var titleArea = document.querySelector("#titlearea");
+    if (title.length > 15) {
+        titleArea.style.fontSize = "18px";
+    } else {
+        titleArea.style.fontSize = "25px";
+    };
+    titleArea.innerHTML = title;
 }
 
 function fetchBox () {

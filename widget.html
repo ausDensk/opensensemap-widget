@@ -1,34 +1,31 @@
 <div class="widget-wrapper">
 <div class="widget-header">
   <img src="sblogo.jpg">
-  <h1>senseBox!</h1>
+  <h1 id="titlearea">senseBox!</h1>
 </div>
 <div class="widget">
 <ol class="widget-list" id="history">
-   <div class="selectwrapper">
-     <label class="custom-select">
-   <select name="currentsensor" id="currentsensorhistory" onchange="fetchBox().then(insertOldEntries).then(checkForNewMeasurements)"></select>
-     </label>
-  </div>
+  <div class="selectwrapper">
+   <select name="currentsensor" class="widgetselect" id="currentsensorhistory" onchange="fetchBox().then(insertOldEntries).then(checkForNewMeasurements)"></select>
+      <div class="arrowwrapper"><div class="arrow"></div></div>
+      </div>
    <div id="history-entries"></div>
 </ol>
 <ol class="widget-list" id="graph">
   <div class="selectwrapper">
-<select name="currentsensorgraph" id="currentsensorgraph" onchange="fetchBox().then(drawGraph)"></select>
+      <select name="currentsensorgraph" id="currentsensorgraph" onchange="fetchBox().then(drawGraph)" class="widgetselect"></select>
+      <div class="arrowwrapper"><div class="arrow"></div></div>
  </div>
  <div id="graph-target"></div>
 </ol>
 <ol class="widget-list" id="sensors"></ol>
 <ul class="widget-tabs">
   <li class="widget-tab">
-    <div style="display: flex; width: 100%; height: 100%">
+    <a href="#sensors" id="sensortab" class="widget-tab-link">Sensors</a>
+  <li class="widget-tab">
     <a href="#history" class="widget-tab-link"  onclick="initHistoryArea()">History</a>
-    </div>
-    <!-- Omitting the end tag is valid HTML and removes the space in-between inline blocks. -->
   <li class="widget-tab">
     <a href="#graph" class="widget-tab-link" onclick="initGraphArea()">Graph</a>
-  <li class="widget-tab">
-    <a href="#sensors" class="widget-tab-link">Sensors</a>
 </ul>
 </div>
 </div>
