@@ -1,14 +1,17 @@
 var widget = document.getElementById("sensebox-widget");
 var sensebox = widget.getAttribute("data-sensebox-id");
+console.log(sensebox);
 
 getWidgetHTML()
 .then(content => {
     widget.innerHTML = content;
     insertStyleWithLoadListener("style.css");
-    console.log(sensebox);
     initSensorArea()
 })
-.catch(err => console.log(err))
+.catch(err => {
+    console.log(err)
+    document.querySelector(".widget").innerHTML = "Es ist ein Fehler aufgetreten: " + err
+})
 
 function getWidgetHTML() {
     var myHeaders = new Headers();
@@ -90,7 +93,7 @@ function updateCurrentSensorValues() {
     })
 }
 
-//Der folgende Code wird nur initiiert, wenn der "Graph"-Button im Widget angeklickt wird.
+//Der folgende Code wird nur initiiert, wenn der "History"-Button im Widget angeklickt wird.
 
 function initHistoryArea() {
         fetchBox()
@@ -117,7 +120,6 @@ function createAndInsertOptions(optionArray, select) {
         var currentOption = optionArray[i];
         newOption.value = currentOption._id;
         newOption.innerHTML = currentOption.title; 
-        console.log(select)   
         select.appendChild(newOption)
     }
 }
@@ -134,12 +136,12 @@ function insertOldEntries(sensorObject) {
             console.log("NICHT LEER!")
             var i = 4;
             while (i >= 0 && measurements[i]) {
-                addEntry(formatDates(new Date(measurements[i].createdAt)), measurements[i].value, currentSensor.unit);
+                addHistoryEntry(formatDates(new Date(measurements[i].createdAt)), measurements[i].value, currentSensor.unit);
                 i--;
             };
         } else {
             console.log("LEER!")
-            document.getElementById("history-entries").innerHTML = "Leider gibt es hierfür noch keine Messwerte."
+            document.getElementById("history-entries").innerHTML = "<p>Leider gibt es hierfür keine aktuellen Messwerte.</p>"
         }
     })
 }
@@ -160,7 +162,7 @@ function searchSensorinArray (id, arr) {
     return undefined;
 };
 
-function addEntry(date, value, unit) {
+function addHistoryEntry(date, value, unit) {
     var newDiv = document.createElement('div');
     newDiv.className = "innerDiv-history";
     newDiv.innerHTML = "<p><i>" + date + "</i>: <b>" + value + unit + "</b></p>";
@@ -194,7 +196,11 @@ function checkForNewMeasurements() {
         var currentSensor = searchSensorinArray(sensorID, sensorData.sensors);
         if (currentSensor.lastMeasurement) {
             var parsedDate = formatDates(new Date(currentSensor.lastMeasurement.createdAt));
-            if (!document.getElementById("history-entries").firstChild.innerHTML.startsWith("<p><i>" + parsedDate)) addEntry(parsedDate, currentSensor.lastMeasurement.value, currentSensor.unit)
+            var firstChild = document.getElementById("history-entries").firstChild;
+            if (!firstChild || !firstChild.innerHTML.startsWith("<p><i>" + parsedDate)) {
+                if (firstChild.innerHTML.startsWith("Leider")) firstChild.innerHTML = "";
+                addHistoryEntry(parsedDate, currentSensor.lastMeasurement.value, currentSensor.unit)
+            }
         }
     })
 }
@@ -237,7 +243,7 @@ function drawGraph(sensorObject) {
                 full_width: true,
                 full_height: true,
                 right: 40,
-                target: graphArea,
+                target: "#graph-target",
                 area: false,
                 backgroundColor: '#8C001A',
                 title: currentSensor.title + " in " + currentSensor.unit,
@@ -245,7 +251,7 @@ function drawGraph(sensorObject) {
                 color: '#8C001A',
                 x_accessor: 'createdAt',
                 y_accessor: 'value',
-                inflator: 5,
+                max_y: setMaxGraphHeight(data),
                 mouseover: function(d, i) {
                     var formattedDate = formatDates(new Date(d.createdAt));
                     var measurement = formattedDate + " -> " + d.value + " " + currentSensor.unit;
@@ -254,9 +260,20 @@ function drawGraph(sensorObject) {
                 }
             });
         } else {
-            graphArea.innerHTML = "Leider gibt es hierfür noch keine Messwerte."
+            graphArea.innerHTML = "<p>Leider gibt es hierfür keine aktuellen Messwerte.</p>"
         }
     })
+}
+
+function setMaxGraphHeight(data) {
+    var maximum = 0;
+    for (var i = 0; i < data.length; i++) {
+        if (parseFloat(data[i].value) > maximum) {
+            maximum = parseFloat(data[i].value)
+        }
+    }
+    var res = Math.round(maximum * 1.2);
+    return res;
 }
 
 function adjustHeight () {
@@ -266,7 +283,7 @@ function adjustHeight () {
     console.log(widgetLists);
     widgetLists.forEach(element => {
         console.log(element);
-        element.style.marginTop = 0.1 * widgetHeight + "px";
+        element.style.marginTop = 0.12 * widgetHeight + "px";
     })
 }
 
