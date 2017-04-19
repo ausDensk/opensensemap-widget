@@ -296,3 +296,46 @@ li:last-child > .widget-list-link {
   margin: auto;
   color: #4EAF47;
 }
+
+.questionmarkwrapper {
+  margin: auto 5px auto;
+  display: flex;
+  cursor: default;
+}
+
+.questionmark {
+  background-color: var(--sensebox-color);
+  border-radius: 100%;
+  color: white;
+  width: 20px;
+  height: 20px;
+}
+
+.questionmark p {
+  text-align: center;
+  font-weight: bold;
+  margin: auto;
+}
+
+.tooltip {
+  visibility: hidden;
+  border: 1px solid lightgrey;
+  border-radius: 3px;
+  position: absolute;
+  background-color: white;
+  z-index: 100;
+  top: 75%;
+  left: 50%;
+  text-align: center;
+}
+
+.tooltip p {
+  margin: 7px;
+  color: grey;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.questionmark:hover ~ .tooltip {
+  visibility: visible;
+}

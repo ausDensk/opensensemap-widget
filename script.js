@@ -6,7 +6,7 @@ getWidgetHTML()
 .then(content => {
     widget.innerHTML = content;
     insertStyleWithLoadListener("style.css");
-    initSensorArea()
+    initSensorArea() //Die Bearbeitung des Widget-Headers (Titel, Beschreibung etc.) läuft auch in dieser Funktion ab, um sich den unnötigen Request zu sparen
 })
 .catch(err => {
     console.log(err)
@@ -34,7 +34,9 @@ function insertWidgetStyle(url) {
 function initSensorArea() {
     return fetchBox()
     .then(sensorData => {
+        console.log(sensorData);
         appendTitle(sensorData.name);
+        appendDescription(sensorData.description);
         console.log(sensorData.name)
         var sensors = sensorData.sensors;
         createSensorDivs(sensors);
@@ -48,11 +50,16 @@ function initSensorArea() {
 function appendTitle(title) {
     var titleArea = document.querySelector("#titlearea");
     if (title.length > 15) {
-        titleArea.style.fontSize = "18px";
+        titleArea.style.fontSize = "14px";
     } else {
         titleArea.style.fontSize = "25px";
     };
     titleArea.innerHTML = title;
+}
+
+function appendDescription(description) {
+    var tooltip = document.querySelector(".tooltip");
+    tooltip.innerHTML = "<p>" + description + "</p>"
 }
 
 function fetchBox () {
@@ -251,7 +258,8 @@ function drawGraph(sensorObject) {
                 color: '#8C001A',
                 x_accessor: 'createdAt',
                 y_accessor: 'value',
-                max_y: setMaxGraphHeight(data),
+                max_y: setMaxGraphValue(data),
+                min_y: setMinGraphValue(data),
                 mouseover: function(d, i) {
                     var formattedDate = formatDates(new Date(d.createdAt));
                     var measurement = formattedDate + " -> " + d.value + " " + currentSensor.unit;
@@ -265,15 +273,24 @@ function drawGraph(sensorObject) {
     })
 }
 
-function setMaxGraphHeight(data) {
+function setMaxGraphValue(data) {
     var maximum = 0;
     for (var i = 0; i < data.length; i++) {
         if (parseFloat(data[i].value) > maximum) {
             maximum = parseFloat(data[i].value)
         }
     }
-    var res = Math.round(maximum * 1.2);
-    return res;
+    return maximum > 0 ? maximum * 1.2 : maximum - maximum * 0.2;
+}
+
+function setMinGraphValue(data) {
+    var minimum = data[0].value;
+    for (var i = 1; i < data.length; i++) {
+        if (parseFloat(data[i].value) < minimum) {
+            minimum = parseFloat(data[i].value)
+        }
+    }
+    return minimum < 0 ? minimum * 1.2 : minimum - minimum * 0.2;
 }
 
 function adjustHeight () {
