@@ -14,8 +14,7 @@
   top: 0;
   left: 0;
   right: 0;
-  padding: 0 1% 0;
-  border-bottom: 1px solid #ddd;
+  padding: 0;
   border-radius: 3px 3px 0 0;
   display: flex;
   margin-top: 0px;
@@ -37,7 +36,7 @@
   border-radius: 5px 5px 0 0;
   padding-bottom: 0;
   bottom: auto;
-  width: 33%;
+  width: 33.33%;
   min-height: 25px;
 }
 
@@ -295,10 +294,11 @@ li:last-child > .widget-list-link {
 #titlearea {
   margin: auto;
   color: #4EAF47;
+  cursor: default;
 }
 
 .questionmarkwrapper {
-  margin: auto 5px auto;
+  margin: auto 3%;
   display: flex;
   cursor: default;
 }
@@ -325,8 +325,9 @@ li:last-child > .widget-list-link {
   background-color: white;
   z-index: 100;
   top: 75%;
-  left: 50%;
+  right: 0;
   text-align: center;
+  max-width: 75%;
 }
 
 .tooltip p {
@@ -337,5 +338,23 @@ li:last-child > .widget-list-link {
 }
 
 .questionmark:hover ~ .tooltip {
+  visibility: visible;
+}
+
+.titletooltip {
+  visibility: hidden;
+  position: absolute;
+  background-color: white;
+  border: 1px solid lightgrey;
+  padding: 1px;
+  z-index: 100;
+  font-size: 12px;
+  color: grey;
+  font-style: italic;
+  text-align: center;
+  cursor: default;
+}
+
+#titlearea:hover ~ .titletooltip {
   visibility: visible;
 }

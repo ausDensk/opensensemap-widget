@@ -49,17 +49,34 @@ function initSensorArea() {
 
 function appendTitle(title) {
     var titleArea = document.querySelector("#titlearea");
-    if (title.length > 15) {
-        titleArea.style.fontSize = "14px";
-    } else {
-        titleArea.style.fontSize = "25px";
-    };
+    var titleTooltip = document.querySelector(".titletooltip");
+    titleTooltip.innerHTML = title;
+    titleArea.style.fontSize = setFontSize(title); 
+    if (title.length > 35) title = shortenTitle(title);
     titleArea.innerHTML = title;
+}
+
+function setFontSize(title) {
+    var widgetHeight = document.querySelector(".widget").offsetHeight;
+    console.log(typeof(widgetHeight) + " " + widgetHeight)
+    if (widgetHeight >= 300) {
+        if (title.length > 15) {
+            return "16px";
+        } else {
+            return "25px";
+        };
+    } else {
+        return "12px"
+    } 
+}
+
+function shortenTitle(title) {
+    return title.substring(0, 32) + "..."
 }
 
 function appendDescription(description) {
     var tooltip = document.querySelector(".tooltip");
-    tooltip.innerHTML = "<p>" + description + "</p>"
+    tooltip.innerHTML = description ? "<p>" + description + "</p>" : "<p>Keine Beschreibung verfügbar.</p>"
 }
 
 function fetchBox () {
