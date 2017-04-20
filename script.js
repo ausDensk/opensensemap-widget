@@ -3,7 +3,20 @@ var sensebox = widget.getAttribute("data-sensebox-id");
 var generalBoxDetails;
 console.log(sensebox);
 
-getWidgetHTML()
+insertStylesheetWithOnloadListener("https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.11.0/metricsgraphics.css")
+/*.then(() => {
+    return insertStylesheetWithOnloadListener("../bower_components/mg-line-brushing/dist/mg_line_brushing.css")
+})*/
+.then(() => {
+    return loadJSAsync("https://unpkg.com/d3")
+})
+.then(() => {
+    return loadJSAsync("https://unpkg.com/metrics-graphics")
+})
+/*.then(() => {
+    return loadJSAsync("../bower_components/mg-line-brushing/dist/mg_line_brushing.js")
+})*/
+.then(getWidgetHTML)
 .then(content => {
     widget.innerHTML = content;
     return fetchBox()
@@ -14,12 +27,33 @@ getWidgetHTML()
 }).then(box => {
     console.log(box);
     applyStylesToWidgetWithJS(box)
-    initSensorArea(box) //Die Bearbeitung des Widget-Headers (Titel, Beschreibung etc.) läuft auch in dieser Funktion ab, um sich den unnötigen Request zu sparen
+    initSensorArea(box)
 })
 .catch(err => {
     console.log(err)
     document.querySelector(".widget").innerHTML = "Es ist ein Fehler aufgetreten: " + err
 })
+
+function checkTargetAndLoadOneOfTheScreens(box) {
+    var currentURL = window.location.href;
+    if (hasURLEnding(currentURL, ["#graph", "#graph/"])) {
+        console.log("initGraphArea")
+        initGraphArea()
+    } else if (hasURLEnding(currentURL, ["#history", "#history/"])) {
+        console.log("initHistoryArea")
+        initHistoryArea()
+    } else {
+        console.log("initSensorArea")
+        initSensorArea(box)
+    }
+}
+
+function hasURLEnding(url, arr) {
+    for (var i in arr) {
+        if (url.endsWith(arr[i])) return true
+    }
+    return false;
+}
 
 function getWidgetHTML() {
     var myHeaders = new Headers();
@@ -30,20 +64,9 @@ function getWidgetHTML() {
     })).then(res => res.text())
 }
 
-function insertWidgetStyle(url) {
-        var link = document.createElement("link");
-        link.rel = "stylesheet";
-        link.type = "text/css";
-        link.href = url;
-        link.onload = () => {
-            adjustHeight();
-        }
-        document.querySelector("head").appendChild(link)
-}
-
 function initSensorArea(sensorData) {
     var sensors = sensorData.sensors;
-    createSensorDivs(sensors);
+    if (document.querySelector("#sensors").innerHTML === "") createSensorDivs(sensors);
     setInterval(updateCurrentSensorValues, 1000)
 }
 
@@ -221,8 +244,8 @@ function checkForNewMeasurements() {
         if (currentSensor.lastMeasurement) {
             var parsedDate = formatDates(new Date(currentSensor.lastMeasurement.createdAt));
             var firstChild = document.getElementById("history-entries").firstChild;
-            if (!firstChild || !firstChild.innerHTML.startsWith("<p><i>" + parsedDate)) {
-                if (firstChild.innerHTML.startsWith("Leider")) firstChild.innerHTML = "";
+            if (!firstChild || firstChild === null || !firstChild.innerHTML.startsWith("<p><i>" + parsedDate)) {
+                if (firstChild && firstChild !== null && firstChild.innerHTML.startsWith("Leider")) firstChild.innerHTML = "";
                 addHistoryEntry(parsedDate, currentSensor.lastMeasurement.value, currentSensor.unit)
             }
         }
@@ -232,14 +255,7 @@ function checkForNewMeasurements() {
 //Diese Funktionen werden aufgerufen, wenn der Graphen-Tab angeklickt wird.
 
 function initGraphArea() {
-    insertStylesheetWithOnloadListener("https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.11.0/metricsgraphics.css")
-    .then(() => {
-        return loadJSAsync("https://unpkg.com/d3")
-    })
-    .then(() => {
-        return loadJSAsync("https://unpkg.com/metrics-graphics")
-    })
-    .then(fetchBox)
+    fetchBox()
     .then(sensorData => {
         var select = document.getElementById("currentsensorgraph");
         if (select.innerHTML === "") {
@@ -266,6 +282,9 @@ function drawGraph(sensorObject) {
     var url = "https://api.opensensemap.org/boxes/" + sensebox + "/data/" + sensorID;
     d3.json(url, function(data) {
         console.log(data);
+        data = reduceAmountOfDrawnData(data);
+        console.log("Getrimmt:")
+        console.log(data[0]);
         if (data.length !== 0) {
             data = MG.convert.date(data, 'createdAt', d3.utcParse("%Y-%m-%dT%H:%M:%S.%LZ"));
             MG.data_graphic({
@@ -361,4 +380,22 @@ function loadJSAsync(url, passThroughData) {
         scriptTag.onload = () => resolve(passThroughData);
         document.head.appendChild(scriptTag)
     })
+}
+
+function reduceAmountOfDrawnData(data) {
+    var resarr = [];
+    console.log(data[0])
+    if (data.length >= 1000) {
+        var dataLengthString = String(data.length)
+        var steps = dataLengthString.substring(0, dataLengthString.length - 3) * 2;
+        for (var i = 0; i < data.length; i += steps) {
+            if (i < 10) console.log(data[i])
+            resarr.push(data[i])
+        }
+    } else {
+        resarr = data
+    };
+    console.log(resarr);
+    console.log(resarr[0]);
+    return resarr
 }
