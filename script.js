@@ -1,12 +1,20 @@
 var widget = document.getElementById("sensebox-widget");
 var sensebox = widget.getAttribute("data-sensebox-id");
+var generalBoxDetails;
 console.log(sensebox);
 
 getWidgetHTML()
 .then(content => {
     widget.innerHTML = content;
-    insertStyleWithLoadListener("style.css");
-    initSensorArea() //Die Bearbeitung des Widget-Headers (Titel, Beschreibung etc.) läuft auch in dieser Funktion ab, um sich den unnötigen Request zu sparen
+    return fetchBox()
+}).then(box => {
+    generalBoxDetails = box;
+    console.log(box);
+    return insertStylesheetWithOnloadListener("style.css", box)
+}).then(box => {
+    console.log(box);
+    applyStylesToWidgetWithJS(box)
+    initSensorArea(box) //Die Bearbeitung des Widget-Headers (Titel, Beschreibung etc.) läuft auch in dieser Funktion ab, um sich den unnötigen Request zu sparen
 })
 .catch(err => {
     console.log(err)
@@ -27,24 +35,16 @@ function insertWidgetStyle(url) {
         link.rel = "stylesheet";
         link.type = "text/css";
         link.href = url;
-        link.onload = adjustHeight();
+        link.onload = () => {
+            adjustHeight();
+        }
         document.querySelector("head").appendChild(link)
 }
 
-function initSensorArea() {
-    return fetchBox()
-    .then(sensorData => {
-        console.log(sensorData);
-        appendTitle(sensorData.name);
-        appendDescription(sensorData.description);
-        console.log(sensorData.name)
-        var sensors = sensorData.sensors;
-        createSensorDivs(sensors);
-        setInterval(updateCurrentSensorValues, 1000)
-    })
-    .catch(err => {
-        document.querySelector("#sensors").innerHTML = "Ein Fehler ist aufgetreten: " + err;
-    })
+function initSensorArea(sensorData) {
+    var sensors = sensorData.sensors;
+    createSensorDivs(sensors);
+    setInterval(updateCurrentSensorValues, 1000)
 }
 
 function appendTitle(title) {
@@ -52,12 +52,12 @@ function appendTitle(title) {
     var titleTooltip = document.querySelector(".titletooltip");
     titleTooltip.innerHTML = title;
     titleArea.style.fontSize = setFontSize(title); 
-    if (title.length > 35) title = shortenTitle(title);
+    if (title.length > 30) title = shortenTitle(title);
     titleArea.innerHTML = title;
 }
 
 function setFontSize(title) {
-    var widgetHeight = document.querySelector(".widget").offsetHeight;
+    var widgetHeight = document.querySelector(".widget-wrapper").offsetHeight;
     console.log(typeof(widgetHeight) + " " + widgetHeight)
     if (widgetHeight >= 300) {
         if (title.length > 15) {
@@ -71,7 +71,7 @@ function setFontSize(title) {
 }
 
 function shortenTitle(title) {
-    return title.substring(0, 32) + "..."
+    return title.substring(0, 27) + "..."
 }
 
 function appendDescription(description) {
@@ -232,24 +232,30 @@ function checkForNewMeasurements() {
 //Diese Funktionen werden aufgerufen, wenn der Graphen-Tab angeklickt wird.
 
 function initGraphArea() {
-    fetchBox()
-        .then(sensorData => {
-            var select = document.getElementById("currentsensorgraph");
-            if (select.innerHTML === "") {
-                var sensors = sensorData.sensors;
-                createAndInsertOptions(sensors, select)
-            }
-            if (document.getElementById("graph-target").innerHTML === "") {
-                drawGraph(sensorData);
-            }
-        })
-        .catch(err => {
-            document.querySelector("#graph-target").innerHTML = "Ein Fehler ist aufgetreten: " + err;
-        })
+    insertStylesheetWithOnloadListener("https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.11.0/metricsgraphics.css")
+    .then(() => {
+        return loadJSAsync("https://unpkg.com/d3")
+    })
+    .then(() => {
+        return loadJSAsync("https://unpkg.com/metrics-graphics")
+    })
+    .then(fetchBox)
+    .then(sensorData => {
+        var select = document.getElementById("currentsensorgraph");
+        if (select.innerHTML === "") {
+            var sensors = sensorData.sensors;
+            createAndInsertOptions(sensors, select)
+        }
+        if (document.getElementById("graph-target").innerHTML === "") {
+            drawGraph(sensorData);
+        }
+    })
+    .catch(err => {
+        document.querySelector("#graph-target").innerHTML = "Ein Fehler ist aufgetreten: " + err;
+    })
 }
 
 function drawGraph(sensorObject) {
-    insertWidgetStyle("https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.11.0/metricsgraphics.css");
     var graphArea = document.getElementById("graph-target");
     graphArea.innerHTML = "";
     var selectedSensor = document.getElementById("currentsensorgraph");
@@ -311,6 +317,7 @@ function setMinGraphValue(data) {
 }
 
 function adjustHeight () {
+    console.log("Height wird adjustet!");
     var widgetHeight = document.querySelector(".widget").getBoundingClientRect().height;
     console.log(widgetHeight);
     var widgetLists = document.querySelectorAll(".widget-list");
@@ -321,17 +328,37 @@ function adjustHeight () {
     })
 }
 
-function insertStyleWithLoadListener(url) {
-    var style = document.createElement('style');
-    style.textContent = '@import "' + url + '"';
-    
-    var fi = setInterval(function() {
-      try {
-        style.sheet.cssRules;
-        adjustHeight();
-        clearInterval(fi);
-      } catch (e){}
-    }, 10);  
-    
-    document.head.appendChild(style);
+function insertStylesheetWithOnloadListener(url, passThroughData) {
+    return new Promise((resolve, reject) => {
+        var style = document.createElement('style');
+        console.log(style);
+        style.textContent = '@import "' + url + '"';
+        document.head.appendChild(style);
+        var onload = setInterval(function() {
+          try {
+            style.sheet.cssRules;
+            console.log("Die Promise-Funktion");
+            clearInterval(onload);
+            resolve(passThroughData);
+          } catch (e){}
+        }, 10);  
+    })
+}
+
+function applyStylesToWidgetWithJS(box) {
+    console.log(box);
+    adjustHeight();
+    appendTitle(box.name);
+    appendDescription(box.description);
+}
+
+function loadJSAsync(url, passThroughData) {
+    return new Promise((resolve, reject) => {
+        var scriptTag = document.createElement("script");
+        scriptTag.type = 'text/javascript';
+        scriptTag.src = url;
+        scriptTag.onreadystatechange = () => resolve(passThroughData);
+        scriptTag.onload = () => resolve(passThroughData);
+        document.head.appendChild(scriptTag)
+    })
 }
