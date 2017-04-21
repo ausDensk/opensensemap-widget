@@ -80,7 +80,7 @@
   display: none;
   overflow-y: auto;
   padding-bottom: 0px;
-  height: 88%;
+  height: 82%;
   position: absolute;
   width: 100%;
 }
@@ -339,7 +339,7 @@ li:last-child > .widget-list-link {
   font-size: 14px;
 }
 
-.questionmark:hover ~ .tooltip {
+.questionmark:hover ~ .tooltip, #titlearea:hover ~ .titletooltip {
   visibility: visible;
 }
 
@@ -357,6 +357,29 @@ li:last-child > .widget-list-link {
   cursor: default;
 }
 
-#titlearea:hover ~ .titletooltip {
-  visibility: visible;
+.widget-footer {
+  height: 5%;
+  position: absolute;
+  bottom: 0;
+  font-style: italic;
+  font-size: 11px;
+  text-decoration: underline;
+  display: flex; 
+  width: 100%;
+  border-top: 1px solid lightgray;
+}
+
+.widget-footer a {
+  padding-left: 5%;
+  line-height:  0;
+  margin: auto 0;
+  vertical-align: middle;
+  padding-bottom: 2px;
+  display: inline;
+  cursor: pointer;
+  -moz-appearance: none;
+  -ms-progress-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  color: gray;
 }

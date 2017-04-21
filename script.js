@@ -37,13 +37,10 @@ insertStylesheetWithOnloadListener("https://cdnjs.cloudflare.com/ajax/libs/metri
 function checkTargetAndLoadOneOfTheScreens(box) {
     var currentURL = window.location.href;
     if (hasURLEnding(currentURL, ["#graph", "#graph/"])) {
-        console.log("initGraphArea")
         initGraphArea()
     } else if (hasURLEnding(currentURL, ["#history", "#history/"])) {
-        console.log("initHistoryArea")
         initHistoryArea()
     } else {
-        console.log("initSensorArea")
         initSensorArea(box)
     }
 }
@@ -67,19 +64,19 @@ function getWidgetHTML() {
 function initSensorArea(sensorData) {
     var sensors = sensorData.sensors;
     if (document.querySelector("#sensors").innerHTML === "") createSensorDivs(sensors);
-    setInterval(updateCurrentSensorValues, 1000)
+    setInterval(updateCurrentSensorValues, 20000)
 }
 
 function appendTitle(title) {
     var titleArea = document.querySelector("#titlearea");
     var titleTooltip = document.querySelector(".titletooltip");
     titleTooltip.innerHTML = title;
-    titleArea.style.fontSize = setFontSize(title); 
+    titleArea.style.fontSize = setTitleFontSize(title); 
     if (title.length > 30) title = shortenTitle(title);
     titleArea.innerHTML = title;
 }
 
-function setFontSize(title) {
+function setTitleFontSize(title) {
     var widgetHeight = document.querySelector(".widget-wrapper").offsetHeight;
     console.log(typeof(widgetHeight) + " " + widgetHeight)
     if (widgetHeight >= 300) {
@@ -151,12 +148,13 @@ function initHistoryArea() {
                 createAndInsertOptions(sensors, select)
             }
             if (document.getElementById("history-entries").innerHTML === "") { //Für den Fall, dass man zum Tab zurückkehrt, nachdem man ihn schon einmal aufgerufen hat
-                insertOldEntries(sensorData).then(() => setInterval(checkForNewMeasurements, 3000));
+                insertOldEntries(sensorData).then(() => setInterval(checkForNewMeasurements, 20000));
             } else {
-                setInterval(checkForNewMeasurements, 3000);
+                setInterval(checkForNewMeasurements, 20000);
             }
         })
         .catch(err => {
+            console.log(err);
             document.getElementById("history-entries").innerHTML = "Es ist ein Fehler aufgetreten: " + err;
         })
 }
@@ -182,14 +180,18 @@ function insertOldEntries(sensorObject) {
         if (measurements.length !== 0) {
             console.log("NICHT LEER!")
             var i = 4;
-            while (i >= 0 && measurements[i]) {
-                addHistoryEntry(formatDates(new Date(measurements[i].createdAt)), measurements[i].value, currentSensor.unit);
+            while (i >= 0) {
+                if (measurements[i]) addHistoryEntry(formatDates(new Date(measurements[i].createdAt)), measurements[i].value, currentSensor.unit);
                 i--;
             };
         } else {
             console.log("LEER!")
             document.getElementById("history-entries").innerHTML = "<p>Leider gibt es hierfür keine aktuellen Messwerte.</p>"
         }
+    })
+    .catch(err => {
+        console.log(err);
+        document.getElementById("history-entries").innerHTML = "<p>Ein Fehler ist aufgetreten: " + err + "</p>"
     })
 }
 
@@ -280,11 +282,15 @@ function drawGraph(sensorObject) {
     console.log(currentSensor)
     console.log(sensorObject);
     var url = "https://api.opensensemap.org/boxes/" + sensebox + "/data/" + sensorID;
-    d3.json(url, function(data) {
+    d3.json(url, function(err, data) {
+        if (err || !data || data === null) {
+            console.log(err);
+            document.querySelector("#graph-target").innerHTML = "Ein Fehler ist aufgetreten: " + err
+        };
         console.log(data);
         data = reduceAmountOfDrawnData(data);
         console.log("Getrimmt:")
-        console.log(data[0]);
+        console.log(data);
         if (data.length !== 0) {
             data = MG.convert.date(data, 'createdAt', d3.utcParse("%Y-%m-%dT%H:%M:%S.%LZ"));
             MG.data_graphic({
@@ -369,6 +375,7 @@ function applyStylesToWidgetWithJS(box) {
     adjustHeight();
     appendTitle(box.name);
     appendDescription(box.description);
+    setFooterLinkHref();
 }
 
 function loadJSAsync(url, passThroughData) {
@@ -384,7 +391,6 @@ function loadJSAsync(url, passThroughData) {
 
 function reduceAmountOfDrawnData(data) {
     var resarr = [];
-    console.log(data[0])
     if (data.length >= 1000) {
         var dataLengthString = String(data.length)
         var steps = dataLengthString.substring(0, dataLengthString.length - 3) * 2;
@@ -395,7 +401,16 @@ function reduceAmountOfDrawnData(data) {
     } else {
         resarr = data
     };
-    console.log(resarr);
-    console.log(resarr[0]);
     return resarr
+}
+
+function setFooterLinkHref() {
+    var footerLink = document.querySelector(".widget-footer").firstElementChild;
+    console.log(footerLink);
+    footerLink.style.fontSize = setFooterFontSize();
+    footerLink.href = "https://opensensemap.org/explore/" + sensebox;
+}
+
+function setFooterFontSize() {
+    return document.querySelector(".widget").offsetHeight >= 400 ? "14px" : "11px"
 }
