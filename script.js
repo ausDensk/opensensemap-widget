@@ -4,18 +4,12 @@ var generalBoxDetails;
 console.log(sensebox);
 
 insertStylesheetWithOnloadListener("https://cdnjs.cloudflare.com/ajax/libs/metrics-graphics/2.11.0/metricsgraphics.css")
-/*.then(() => {
-    return insertStylesheetWithOnloadListener("../bower_components/mg-line-brushing/dist/mg_line_brushing.css")
-})*/
 .then(() => {
     return loadJSAsync("https://unpkg.com/d3")
 })
 .then(() => {
     return loadJSAsync("https://unpkg.com/metrics-graphics")
 })
-/*.then(() => {
-    return loadJSAsync("../bower_components/mg-line-brushing/dist/mg_line_brushing.js")
-})*/
 .then(getWidgetHTML)
 .then(content => {
     widget.innerHTML = content;
@@ -23,7 +17,7 @@ insertStylesheetWithOnloadListener("https://cdnjs.cloudflare.com/ajax/libs/metri
 }).then(box => {
     generalBoxDetails = box;
     console.log(box);
-    return insertStylesheetWithOnloadListener("style.css", box)
+    return insertStylesheetWithOnloadListener("https://ausdensk.github.io/opensensemap-widget/style.css", box)
 }).then(box => {
     console.log(box);
     applyStylesToWidgetWithJS(box)
@@ -55,7 +49,7 @@ function hasURLEnding(url, arr) {
 function getWidgetHTML() {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "text/html");
-    return fetch(new Request("widget.html", {
+    return fetch(new Request("https://ausdensk.github.io/opensensemap-widget/widget.html", {
         method: "GET",
         headers: myHeaders
     })).then(res => res.text())
@@ -64,7 +58,7 @@ function getWidgetHTML() {
 function initSensorArea(sensorData) {
     var sensors = sensorData.sensors;
     if (document.querySelector("#sensors").innerHTML === "") createSensorDivs(sensors);
-    setInterval(updateCurrentSensorValues, 20000)
+    setInterval(updateCurrentSensorValues, 30000)
 }
 
 function appendTitle(title) {
@@ -148,9 +142,9 @@ function initHistoryArea() {
                 createAndInsertOptions(sensors, select)
             }
             if (document.getElementById("history-entries").innerHTML === "") { //Für den Fall, dass man zum Tab zurückkehrt, nachdem man ihn schon einmal aufgerufen hat
-                insertOldEntries(sensorData).then(() => setInterval(checkForNewMeasurements, 20000));
+                insertOldEntries(sensorData).then(() => setInterval(checkForNewMeasurements, 30000));
             } else {
-                setInterval(checkForNewMeasurements, 20000);
+                setInterval(checkForNewMeasurements, 30000);
             }
         })
         .catch(err => {
