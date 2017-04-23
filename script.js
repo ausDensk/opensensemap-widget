@@ -383,12 +383,13 @@ function insertStylesheetWithOnloadListener(url, passThroughData) {
 
 function applyStylesToWidgetWithJS(box) {
     console.log(box);
-    adjustHeight();
-    document.querySelectorAll(".widget-list").forEach((element, index, array) => {
-        adjustMarginTopWithParentHeight(document.querySelector(".widget"), element, {
+    var widgetLists = ["#graph", "#sensors", "#history"];
+    for (var i in widgetLists) {
+        var currentWidgetList = document.querySelector(widgetLists[i]);
+        adjustMarginTopWithParentHeight(document.querySelector(".widget"), widgetLists[i], {
             top: 0.12
         });
-    });
+    };
     adjustPaddingTopWithParentHeight(document.querySelector(".widget-header"), document.querySelector(".widget-header img"), {
         top: 0.1,
         bottom: 0.1
