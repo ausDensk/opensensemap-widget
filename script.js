@@ -346,9 +346,10 @@ function adjustHeight () {
     console.log(widgetHeight);
     var widgetLists = document.querySelectorAll(".widget-list");
     console.log(widgetLists);
-    for (var i in widgetLists) {
-        widgetLists[i].style.marginTop = 0.12 * widgetHeight + "px";
-    }
+    widgetLists.forEach(element => {
+        console.log(element);
+        element.style.marginTop = 0.12 * widgetHeight + "px";
+    })
 }
 
 function adjustMarginTopWithParentHeight (parent, child, margin) {
