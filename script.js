@@ -342,14 +342,14 @@ function setMinGraphValue(data) {
 
 function adjustHeight () {
     console.log("Height wird adjustet!");
-    var widgetHeight = document.querySelector(".widget").getBoundingClientRect().height;
-    console.log(widgetHeight);
+    var widget = document.querySelector(".widget");
+    var widgetHeight = widget.getBoundingClientRect().height;
     var widgetLists = document.querySelectorAll(".widget-list");
-    console.log(widgetLists);
-    widgetLists.forEach(element => {
-        console.log(element);
-        element.style.marginTop = 0.12 * widgetHeight + "px";
-    })
+    for (var i = 1; i < 4; i++) {
+        var currentWidgetList = widget.childNodes[i];
+        console.log(currentWidgetList);
+        currentWidgetList.style.marginTop = 0.12 * widgetHeight + "px";
+    }
 }
 
 function adjustMarginTopWithParentHeight (parent, child, margin) {
