@@ -344,9 +344,9 @@ function adjustHeight () {
     console.log("Height wird adjustet!");
     var widget = document.querySelector(".widget");
     var widgetHeight = widget.getBoundingClientRect().height;
-    var widgetLists = document.querySelectorAll(".widget-list");
-    for (var i = 1; i < 4; i++) {
-        var currentWidgetList = widget.childNodes[i];
+    var widgetLists = ["#graph", "#sensors", "#history"];
+    for (var i in widgetLists) {
+        var currentWidgetList = document.querySelector(widgetLists[i]);
         console.log(currentWidgetList);
         currentWidgetList.style.marginTop = 0.12 * widgetHeight + "px";
     }
