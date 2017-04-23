@@ -386,7 +386,7 @@ function applyStylesToWidgetWithJS(box) {
     var widgetLists = ["#graph", "#sensors", "#history"];
     for (var i in widgetLists) {
         var currentWidgetList = document.querySelector(widgetLists[i]);
-        adjustMarginTopWithParentHeight(document.querySelector(".widget"), widgetLists[i], {
+        adjustMarginTopWithParentHeight(document.querySelector(".widget"), currentWidgetList, {
             top: 0.12
         });
     };
