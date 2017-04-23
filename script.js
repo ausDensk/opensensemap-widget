@@ -65,22 +65,27 @@ function appendTitle(title) {
     var titleArea = document.querySelector("#titlearea");
     var titleTooltip = document.querySelector(".titletooltip");
     titleTooltip.innerHTML = title;
-    titleArea.style.fontSize = setTitleFontSize(title); 
+    titleArea.style.fontSize = setTitleFontSize(title);
     if (title.length > 30) title = shortenTitle(title);
     titleArea.innerHTML = title;
 }
 
 function setTitleFontSize(title) {
     var widgetHeight = document.querySelector(".widget-wrapper").offsetHeight;
-    console.log(typeof(widgetHeight) + " " + widgetHeight)
+    console.log(typeof(widgetHeight) + " " + widgetHeight);
     if (widgetHeight >= 300) {
         if (title.length > 15) {
             return "16px";
         } else {
             return "25px";
-        };
+        }
     } else {
-        return "12px"
+        console.log("Height < 300px " + title.length);
+        if (title.length > 15) {
+            return "12px";
+        } else {
+            return "15px";
+        }
     } 
 }
 
@@ -347,6 +352,18 @@ function adjustHeight () {
     })
 }
 
+function adjustMarginTopWithParentHeight (parent, child, margin) {
+    var elementHeight = parent.offsetHeight;
+    if (margin.top) child.style.marginTop = margin.top * elementHeight + "px";
+    if (margin.bottom) child.style.marginBottom = margin.bottom * elementHeight + "px";
+}
+
+function adjustPaddingTopWithParentHeight (parent, child, padding) {
+    var elementHeight = parent.offsetHeight;
+    if (padding.top) child.style.paddingTop = padding.top * elementHeight + "px";
+    if (padding.bottom) child.style.paddingBottom = padding.bottom * elementHeight + "px";
+}
+
 function insertStylesheetWithOnloadListener(url, passThroughData) {
     return new Promise((resolve, reject) => {
         var style = document.createElement('style');
@@ -360,16 +377,26 @@ function insertStylesheetWithOnloadListener(url, passThroughData) {
             clearInterval(onload);
             resolve(passThroughData);
           } catch (e){}
-        }, 10);  
+        }, 10);
     })
 }
 
 function applyStylesToWidgetWithJS(box) {
     console.log(box);
     adjustHeight();
+    document.querySelectorAll(".widget-list").forEach((element, index, array) => {
+        adjustMarginTopWithParentHeight(document.querySelector(".widget"), element, {
+            top: 0.12
+        });
+    });
+    adjustPaddingTopWithParentHeight(document.querySelector(".widget-header"), document.querySelector(".widget-header img"), {
+        top: 0.1,
+        bottom: 0.1
+    });
     appendTitle(box.name);
     appendDescription(box.description);
     setFooterLinkHref();
+    setFooterFontSize();
 }
 
 function loadJSAsync(url, passThroughData) {
@@ -401,10 +428,9 @@ function reduceAmountOfDrawnData(data) {
 function setFooterLinkHref() {
     var footerLink = document.querySelector(".widget-footer").firstElementChild;
     console.log(footerLink);
-    footerLink.style.fontSize = setFooterFontSize();
     footerLink.href = "https://opensensemap.org/explore/" + sensebox;
 }
 
 function setFooterFontSize() {
-    return document.querySelector(".widget").offsetHeight >= 400 ? "14px" : "11px"
+    document.querySelector(".widget-footer").style.fontSize = document.querySelector(".widget").offsetHeight >= 400 ? "14px" : "11px"
 }
